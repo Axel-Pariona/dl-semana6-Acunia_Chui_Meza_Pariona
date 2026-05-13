@@ -1,0 +1,19 @@
+# PC2 - Arquitecturas CNN, Batch Normalization y Transfer Learning
+# Framework principal: PyTorch
+# Recomendado para Google Colab / Python 3.10+
+
+torch
+torchvision
+torchaudio
+
+numpy
+pandas
+matplotlib
+scikit-learn
+pillow
+tqdm
+
+jupyter
+ipykernel
+
+kaggle

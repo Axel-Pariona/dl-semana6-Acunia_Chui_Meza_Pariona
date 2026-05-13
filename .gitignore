@@ -1,0 +1,69 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+.ipynb_checkpoints/
+
+# =========================
+# Google Colab / Jupyter
+# =========================
+*.ipynb_checkpoints
+.cache/
+.config/
+
+# =========================
+# Kaggle credentials
+# =========================
+kaggle.json
+.kaggle/
+
+# =========================
+# Dataset
+# =========================
+data/blood_cells/
+data/*.zip
+data/**/*.zip
+data/dataset-master/
+data/dataset2-master/
+
+# Mantener scripts de descarga
+!data/download_data.sh
+!data/download_data.ps1
+
+# =========================
+# Resultados pesados
+# =========================
+results/checkpoints/
+*.pth
+*.pt
+*.ckpt
+*.h5
+
+# Opcional: no subir outputs muy pesados
+# results/figures/
+# results/metrics/
+
+# =========================
+# Sistema operativo / IDE
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# =========================
+# Logs
+# =========================
+*.log
+wandb/
+runs/
