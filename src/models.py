@@ -1,13 +1,13 @@
 import torch
 import torch.nn as nn
 
+from torchvision import models
+from torchvision.models import ResNet18_Weights
 
 class LeNet5(nn.Module):
     """
     LeNet-5 adaptado para imágenes RGB de 64x64.
-    Estructura:
-    - 2 bloques Conv + Pool
-    - 3 capas fully connected
+    Mantiene 2 bloques conv-pool y 3 capas fully connected.
     """
 
     def __init__(self, num_classes=4):
@@ -23,10 +23,6 @@ class LeNet5(nn.Module):
             nn.AvgPool2d(kernel_size=2, stride=2)
         )
 
-        # Entrada: 64x64
-        # Conv1: 60x60 -> Pool: 30x30
-        # Conv2: 26x26 -> Pool: 13x13
-        # Flatten: 16 * 13 * 13
         self.classifier = nn.Sequential(
             nn.Linear(16 * 13 * 13, 120),
             nn.ReLU(),
@@ -84,26 +80,21 @@ class LeNet5BN(nn.Module):
 class VGG11Small(nn.Module):
     """
     VGG-11 simplificado.
-    Filtros reducidos a la mitad respecto a VGG-11 original:
-    Original: 64, 128, 256, 256, 512, 512, 512, 512
-    Reducido: 32, 64, 128, 128, 256, 256, 256, 256
+    Filtros reducidos a la mitad respecto a VGG-11 original.
     """
 
     def __init__(self, num_classes=4):
         super(VGG11Small, self).__init__()
 
         self.features = nn.Sequential(
-            # Bloque 1
             nn.Conv2d(3, 32, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
-            # Bloque 2
             nn.Conv2d(32, 64, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
-            # Bloque 3
             nn.Conv2d(64, 128, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
 
@@ -111,7 +102,6 @@ class VGG11Small(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
-            # Bloque 4
             nn.Conv2d(128, 256, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
 
@@ -119,7 +109,6 @@ class VGG11Small(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
-            # Bloque 5
             nn.Conv2d(256, 256, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
 
@@ -128,9 +117,6 @@ class VGG11Small(nn.Module):
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
 
-        # Entrada 64x64
-        # Después de 5 MaxPool: 64 -> 32 -> 16 -> 8 -> 4 -> 2
-        # Salida: 256 x 2 x 2
         self.classifier = nn.Sequential(
             nn.Linear(256 * 2 * 2, 512),
             nn.ReLU(inplace=True),
@@ -159,19 +145,16 @@ class VGG11SmallBN(nn.Module):
         super(VGG11SmallBN, self).__init__()
 
         self.features = nn.Sequential(
-            # Bloque 1
             nn.Conv2d(3, 32, kernel_size=3, padding=1),
             nn.BatchNorm2d(32),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
-            # Bloque 2
             nn.Conv2d(32, 64, kernel_size=3, padding=1),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
-            # Bloque 3
             nn.Conv2d(64, 128, kernel_size=3, padding=1),
             nn.BatchNorm2d(128),
             nn.ReLU(inplace=True),
@@ -181,7 +164,6 @@ class VGG11SmallBN(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
-            # Bloque 4
             nn.Conv2d(128, 256, kernel_size=3, padding=1),
             nn.BatchNorm2d(256),
             nn.ReLU(inplace=True),
@@ -191,7 +173,6 @@ class VGG11SmallBN(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
-            # Bloque 5
             nn.Conv2d(256, 256, kernel_size=3, padding=1),
             nn.BatchNorm2d(256),
             nn.ReLU(inplace=True),
@@ -219,3 +200,49 @@ class VGG11SmallBN(nn.Module):
         x = torch.flatten(x, 1)
         x = self.classifier(x)
         return x
+    
+
+def build_resnet18_transfer(strategy, num_classes=4):
+    """
+    Construye ResNet-18 preentrenada en ImageNet para Transfer Learning.
+
+    Estrategias:
+    - feature_extraction
+    - fine_tuning_partial
+    - fine_tuning_total
+    """
+
+    weights = ResNet18_Weights.DEFAULT
+    model = models.resnet18(weights=weights)
+
+    in_features = model.fc.in_features
+    model.fc = nn.Linear(in_features, num_classes)
+
+    if strategy == "feature_extraction":
+        for param in model.parameters():
+            param.requires_grad = False
+
+        for param in model.fc.parameters():
+            param.requires_grad = True
+
+    elif strategy == "fine_tuning_partial":
+        for param in model.parameters():
+            param.requires_grad = False
+
+        for param in model.layer3.parameters():
+            param.requires_grad = True
+
+        for param in model.layer4.parameters():
+            param.requires_grad = True
+
+        for param in model.fc.parameters():
+            param.requires_grad = True
+
+    elif strategy == "fine_tuning_total":
+        for param in model.parameters():
+            param.requires_grad = True
+
+    else:
+        raise ValueError("Estrategia no válida.")
+
+    return model

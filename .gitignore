@@ -43,15 +43,22 @@ data/dataset2-master/
 # =========================
 # Resultados pesados
 # =========================
-results/checkpoints/
+results/checkpoints/*
 *.pth
 *.pt
 *.ckpt
 *.h5
 
-# Opcional: no subir outputs muy pesados
-# results/figures/
-# results/metrics/
+# Permitir mantener la carpeta checkpoints sin modelos pesados
+!results/checkpoints/.gitkeep
+
+# =========================
+# Resultados ligeros
+# =========================
+# Se permite subir figures y metrics porque son parte del análisis.
+# Si alguna figura pesa demasiado, se puede excluir manualmente.
+!results/figures/
+!results/metrics/
 
 # =========================
 # Sistema operativo / IDE

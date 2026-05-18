@@ -1,0 +1,5 @@
+Modelo,Estrategia,Learning_rate,Parametros_entrenables,Tiempo_promedio_epoca_s,Best_val_accuracy,Test_accuracy,Test_loss
+VGG11Small_BN,Entrenado desde cero,,2966148,45.85,0.9392,0.7845,0.6899
+ResNet18_Feature_Extraction,feature_extraction,0.001,2052,143.85,0.7042,0.5943,1.0448
+ResNet18_Fine_Tuning_Parcial,fine_tuning_partial,0.0001,10495492,231.26,1.0,0.8597,0.836
+ResNet18_Fine_Tuning_Total,fine_tuning_total,1e-05,11178564,360.5,0.9985,0.8573,0.5786

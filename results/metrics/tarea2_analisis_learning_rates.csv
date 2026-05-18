@@ -1,0 +1,7 @@
+Modelo,Batch_Normalization,Learning_rate,Parametros_entrenables,Tiempo_promedio_epoca_s,Best_val_accuracy,Test_accuracy,Test_loss
+VGG11Small_sin_BN_LR_0.001,sin BN,0.001,2963396,43.85,0.2557,0.2505,1.3865
+VGG11Small_con_BN_LR_0.001,con BN,0.001,2966148,48.87,0.7494,0.6405,1.1726
+VGG11Small_sin_BN_LR_0.003,sin BN,0.003,2963396,42.75,0.2557,0.2505,1.3868
+VGG11Small_con_BN_LR_0.003,con BN,0.003,2966148,48.34,0.785,0.649,0.7376
+VGG11Small_sin_BN_LR_0.01,sin BN,0.01,2963396,42.31,0.2557,0.2505,1.3864
+VGG11Small_con_BN_LR_0.01,con BN,0.01,2966148,46.7,0.2557,0.2505,1.387

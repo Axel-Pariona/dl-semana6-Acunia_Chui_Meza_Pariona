@@ -1,60 +1,229 @@
-# Clasificación de Células Sanguíneas con CNN y Transfer Learning
+# Clasificación de Células Sanguíneas con CNN, Batch Normalization y Transfer Learning
 
-[cite_start]Este repositorio contiene la implementación y el análisis del Trabajo Práctico de la Semana 6[cite: 1, 2]. [cite_start]El objetivo es entrenar y evaluar arquitecturas clásicas de redes neuronales convolucionales sobre un dataset real de imágenes microscópicas médicas[cite: 5, 6].
+Este repositorio contiene la implementación y análisis de la PC2 del curso **Introduction to Deep Learning**. El objetivo es entrenar, evaluar y comparar arquitecturas clásicas de redes neuronales convolucionales sobre un dataset real de imágenes microscópicas médicas.
 
----
+El proyecto aborda tres componentes principales:
 
-## 🛠️ Instalación y Ejecución
-
-### Requisitos Previos
-El código está desarrollado en Python 3.8+ utilizando el framework PyTorch. Todos los experimentos son completamente reproducibles fijando las semillas globales del sistema (`seed=42`).
-
-### Instalación de Dependencias
-Asegúrate de instalar las librerías necesarias ejecutando el siguiente comando en tu terminal:
-pip install torch torchvision numpy pandas matplotlib seaborn scikit-learn
+- Implementación desde cero de LeNet-5 y VGG-11 simplificado.
+- Análisis del efecto de Batch Normalization.
+- Aplicación de Transfer Learning con ResNet-18 preentrenada en ImageNet.
 
 ---
 
-## Ejecución de los Notebooks
+## Dataset
 
-La lógica se encuentra modularizada y separada en la carpeta notebooks/ siguiendo la estructura estricta exigida en la guía del entregable:
+Se utilizó el **Blood Cell Image Dataset** de Kaggle.
 
-1. Ejecutar notebooks/01_eda.ipynb para el análisis exploratorio de datos y distribución de clases.
+- **Clases:** EOSINOPHIL, LYMPHOCYTE, MONOCYTE y NEUTROPHIL.
+- **Tipo de imágenes:** RGB.
+- **Tamaño original:** 320x240 píxeles.
+- **Cantidad aproximada:** 12,500 imágenes.
+- **Split:** Train/Test provisto por el dataset.
 
-2. Ejecutar notebooks/02_lenet_vgg.ipynb para el entrenamiento de arquitecturas desde cero y el análisis de Batch Normalization (Tareas 1 y 2).
-
-3. Ejecutar notebooks/03_transfer.ipynb para evaluar las estrategias de Transfer Learning (Tarea 3).
-
----
-
-## 📊 Dataset: Blood Cell Image Dataset (Kaggle)
-
-* [cite_start]**Clases:** 4 (EOSINOPHIL, LYMPHOCYTE, MONOCYTE, NEUTROPHIL)[cite: 12].
-* [cite_start]**Imágenes:** ~12,500 imágenes RGB redimensionadas a 64x64x3 px[cite: 12, 18].
-* [cite_start]**Split:** Train / Test provisto por el dataset[cite: 12].
+Para los modelos entrenados desde cero se redimensionaron las imágenes a **64x64x3**.  
+Para Transfer Learning con ResNet-18 se utilizaron imágenes de **224x224x3**.
 
 ---
 
-## 📈 Tabla Resumen de Resultados
+## Estructura del Proyecto
 
-| Tarea | Arquitectura / Estrategia | Learning Rate | Parámetros Entrenables | Test Accuracy |
-| :--- | :--- | :--- | :--- | :--- |
-| **Tarea 1** | LeNet-5 Estándar | 0.001 | ~400,000 | 74.79% |
-| **Tarea 1** | LeNet-5 + Batch Normalization | 0.001 | ~400,000 | 51.31% |
-| **Tarea 1** | VGG11Small Estándar | 0.001 | 2,966,148 | 34.38% |
-| **Tarea 1** | **VGG11Small + BN (Mejor desde cero)** | 0.001 | 2,966,148 | **83.31%** |
-| **Tarea 2** | VGG11Small + BN | 0.003 | 2,966,148 | 68.64% |
-| **Tarea 2** | VGG11Small + BN | 0.010 | 2,966,148 | 25.01% |
-| **Tarea 3** | ResNet18: Feature Extraction | 0.001 | 2,052 | 59.43% |
-| **Tarea 3** | ResNet18: Fine-tuning Parcial | 0.0001 | 10,495,492 | 81.54% |
-| **Tarea 3** | **ResNet18: Fine-tuning Total (Mejor Global)** | 0.00001 | 11,178,564 | **85.77%** |
+```text
+dl-semana6-Acunia_Chui_Meza_Pariona/
+├── README.md
+├── requirements.txt
+├── .gitignore
+├── data/
+│   ├── download_data.sh
+│   └── download_data.ps1
+├── notebooks/
+│   ├── 01_eda.ipynb
+│   ├── 02_lenet_vgg.ipynb
+│   └── 03_transfer.ipynb
+├── src/
+│   ├── models.py
+│   ├── train.py
+│   └── utils.py
+├── results/
+│   ├── figures/
+│   └── metrics/
+└── informe.pdf
+```
 
 ---
 
-## 💡 Principales Hallazgos y Conclusiones
+## Instalación
 
-* [cite_start]**Efecto de Batch Normalization (BN):** En la red profunda `VGG11Small`, BN fue crítico para mitigar el *Internal Covariate Shift* (Ioffe & Szegedy, 2015)[cite: 30], elevando la precisión de test del **34.38% al 83.31%**. En la red superficial `LeNet-5` el efecto fue inverso (**74.79% vs 51.31%**), debido a que la normalización distorsionó las activaciones en un espacio de características muy acotado.
-* [cite_start]**Velocidad de Convergencia:** Con un LR de `0.001`, `VGG11Small + BN` superó el umbral del **80% de accuracy en la Época 4 de validación**[cite: 29], mientras que la versión estándar sin BN jamás convergió. [cite_start]No obstante, BN demostró límites, ya que tasas de aprendizaje excesivas (`0.01`) provocaron la divergencia matemática del modelo[cite: 31].
-* [cite_start]**Superioridad del Transfer Learning:** El **Fine-tuning Total** con `ResNet-18` preentrenada arrojó el desempeño óptimo de todo el proyecto (**85.77% Test Accuracy**) [cite: 32, 34][cite_start], demostrando la eficiencia de sintonizar todas las capas con un Learning Rate sumamente pequeño (`1e-5`)[cite: 34, 35].
-* [cite_start]**Contexto de Datos Médicos Limitados:** Aunque el ajuste fino total consiguió la mayor métrica, **se recomienda implementar el Fine-tuning Parcial en escenarios con datos médicos limitados**[cite: 36]. [cite_start]Al congelar los primeros bloques, actúa como un regularizador estructural que previene el sobreajuste y la memorización de ruido microscópico[cite: 34].
-* **Análisis por Clase:** El clasificador demostró un rendimiento perfecto en la detección de `LYMPHOCYTE` (1.00 F1-Score). [cite_start]La mayor brecha se presentó en la confusión de `NEUTROPHIL` frente a `EOSINOPHIL`, debido a similitudes morfológicas y granulométricas biológicas intrínsecas que pierden nitidez al reducir la resolución a 64x64 px[cite: 12, 18].
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/Axel-Pariona/dl-semana6-Acunia_Chui_Meza_Pariona.git
+cd dl-semana6-Acunia_Chui_Meza_Pariona
+```
+
+### 2. Crear entorno virtual
+
+En Windows:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\activate
+```
+
+En Linux/Mac:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Instalar dependencias
+
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+---
+
+## Descarga del Dataset
+
+Para descargar el dataset se necesita configurar previamente la API de Kaggle.
+
+El archivo `kaggle.json` debe estar ubicado en:
+
+```text
+C:\Users\<usuario>\.kaggle\kaggle.json
+```
+
+En Windows:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File data/download_data.ps1
+```
+
+En Linux, Git Bash o Google Colab:
+
+```bash
+bash data/download_data.sh
+```
+
+Luego de la descarga, la ruta esperada es:
+
+```text
+data/blood_cells/dataset2-master/dataset2-master/images/
+```
+
+---
+
+## Ejecución de Notebooks
+
+Los notebooks deben ejecutarse en este orden:
+
+1. `notebooks/01_eda.ipynb`  
+   Análisis exploratorio del dataset: distribución por clase, visualización de ejemplos, tamaños de imagen y revisión de imágenes corruptas.
+
+2. `notebooks/02_lenet_vgg.ipynb`  
+   Implementación y entrenamiento desde cero de LeNet-5 y VGG-11 simplificado, con y sin Batch Normalization. También incluye el análisis del efecto de Batch Normalization.
+
+3. `notebooks/03_transfer.ipynb`  
+   Aplicación de Transfer Learning con ResNet-18 preentrenada en ImageNet mediante tres estrategias: Feature Extraction, Fine-tuning parcial y Fine-tuning total.
+
+---
+
+## Resultados Principales
+
+### Tarea 1: CNN entrenadas desde cero
+
+| Modelo | Learning Rate | Parámetros Entrenables | Test Accuracy | Test Loss |
+|---|---:|---:|---:|---:|
+| LeNet | 0.001 | 337,976 | 74.79% | 0.7932 |
+| LeNet + BN | 0.001 | 338,020 | 51.31% | 3.5496 |
+| VGG11Small | 0.001 | 2,963,396 | 34.38% | 1.3740 |
+| **VGG11Small + BN** | 0.001 | 2,966,148 | **83.31%** | 1.3317 |
+
+El mejor modelo entrenado desde cero fue **VGG11Small_BN**, alcanzando **83.31% de accuracy en test**.
+
+---
+
+### Tarea 2: Análisis de Batch Normalization
+
+| Modelo | Batch Normalization | Learning Rate | Test Accuracy | Test Loss |
+|---|---|---:|---:|---:|
+| VGG11Small | Sin BN | 0.001 | 25.05% | 1.3864 |
+| VGG11Small + BN | Con BN | 0.001 | 80.18% | 0.5163 |
+| VGG11Small | Sin BN | 0.003 | 25.05% | 1.3868 |
+| VGG11Small + BN | Con BN | 0.003 | 69.00% | 1.0727 |
+| VGG11Small | Sin BN | 0.010 | 25.05% | 1.3864 |
+| VGG11Small + BN | Con BN | 0.010 | 71.93% | 0.4776 |
+
+Los modelos sin Batch Normalization permanecieron cerca del azar, aproximadamente 25% para un problema de 4 clases. En cambio, las variantes con BN lograron aprender patrones discriminativos, especialmente con `LR=0.001`.
+
+---
+
+### Tarea 3: Transfer Learning con ResNet-18
+
+| Modelo / Estrategia | Learning Rate | Parámetros Entrenables | Test Accuracy | Test Loss |
+|---|---:|---:|---:|---:|
+| VGG11Small_BN desde cero | 0.001 | 2,966,148 | 83.31% | 1.3317 |
+| ResNet18 Feature Extraction | 0.001 | 2,052 | 59.43% | - |
+| ResNet18 Fine-tuning Parcial | 0.0001 | 10,495,492 | 81.54% | - |
+| **ResNet18 Fine-tuning Total** | 0.00001 | 11,178,564 | **85.77%** | 0.5750 |
+
+El mejor modelo global fue **ResNet18 con Fine-tuning Total**, alcanzando **85.77% de accuracy en test**.
+
+---
+
+## Principales Hallazgos
+
+- **Batch Normalization fue clave en VGG11Small.**  
+  VGG11Small sin BN obtuvo 34.38% en test, mientras que VGG11Small_BN alcanzó 83.31%.
+
+- **Batch Normalization no siempre mejora modelos pequeños.**  
+  En LeNet-5, la versión sin BN obtuvo 74.79%, mientras que LeNet_BN alcanzó 51.31%.
+
+- **El learning rate sigue siendo crítico.**  
+  BN mejoró la estabilidad del entrenamiento, pero el rendimiento siguió dependiendo de una selección adecuada del learning rate.
+
+- **Transfer Learning obtuvo el mejor desempeño global.**  
+  ResNet18 con Fine-tuning Total alcanzó 85.77% de accuracy en test.
+
+- **Recomendación para datos médicos limitados.**  
+  Aunque Fine-tuning Total obtuvo la mejor métrica experimental, en un escenario médico con pocos datos se recomienda iniciar con Fine-tuning Parcial, ya que reduce el número de parámetros entrenables y disminuye el riesgo de sobreajuste.
+
+- **Análisis por clase.**  
+  El mejor modelo clasificó correctamente la clase LYMPHOCYTE, mientras que la mayor confusión se presentó entre EOSINOPHIL y NEUTROPHIL.
+
+---
+
+## Reproducibilidad
+
+Para asegurar reproducibilidad:
+
+- Se fijó una semilla global `seed=42`.
+- Se usó `torch.manual_seed`.
+- Se controló la división train/validation.
+- Se guardaron checkpoints del mejor modelo según accuracy de validación.
+- Las métricas y figuras se almacenaron en `results/metrics/` y `results/figures/`.
+
+---
+
+## Tecnologías Utilizadas
+
+- Python
+- PyTorch
+- Torchvision
+- NumPy
+- Pandas
+- Matplotlib
+- Scikit-learn
+- Kaggle API
+- Google Colab / VS Code
+
+---
+
+## Autores
+
+- Acuña Villegas, Omar Junior
+- Chui Sanchez, Rafael Tomas
+- Meza Polo, Rodrigo Alejandro
+- Pariona Rojas, Axel Yamir

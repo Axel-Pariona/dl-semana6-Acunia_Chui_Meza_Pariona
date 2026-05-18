@@ -1,0 +1,5 @@
+Modelo,Parametros_entrenables,Tiempo_promedio_epoca_s,Best_val_accuracy,Test_accuracy,Test_loss
+LeNet,337976,18.17,0.8177,0.7065,0.921
+LeNet_BN,338020,18.6,0.9533,0.5657,2.1843
+VGG11Small,2963396,40.36,0.2541,0.2493,1.3865
+VGG11Small_BN,2966148,45.85,0.9392,0.7845,0.6899

@@ -1,0 +1,7 @@
+Modelo,Learning_rate,Batch_Normalization,Epoca_80_train_acc,Epoca_80_val_acc,Max_train_acc,Max_val_acc
+VGG11Small_con_BN_LR_0.001,0.001,con BN,No alcanzó,No alcanzó,0.7368,0.7494
+VGG11Small_sin_BN_LR_0.001,0.001,sin BN,No alcanzó,No alcanzó,0.2555,0.2557
+VGG11Small_con_BN_LR_0.003,0.003,con BN,9,No alcanzó,0.8708,0.785
+VGG11Small_sin_BN_LR_0.003,0.003,sin BN,No alcanzó,No alcanzó,0.2565,0.2557
+VGG11Small_con_BN_LR_0.01,0.01,con BN,No alcanzó,No alcanzó,0.2533,0.2557
+VGG11Small_sin_BN_LR_0.01,0.01,sin BN,No alcanzó,No alcanzó,0.2496,0.2557
